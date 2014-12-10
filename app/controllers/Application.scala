@@ -1,12 +1,14 @@
 package controllers
 
+import models.TopLevel
 import play.api._
+import play.api.libs.json.Json
 import play.api.mvc._
 
 object Application extends Controller {
 
   def index = Action {
-  	Ok("""{"links":{}}""").as("application/vnd.api+json")
+  	Ok(Json.toJson(TopLevel(links=Some(Map.empty)))).as("application/vnd.api+json")
   }
 
 }
