@@ -6,7 +6,7 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-  	Ok("""{"links":{}}""")
+  	Ok("""{"links":{}}""").as("application/vnd.api+json")
   }
 
 }
