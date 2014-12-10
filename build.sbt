@@ -1,4 +1,4 @@
-name := """play-scala"""
+name := """play-api-example"""
 
 version := "1.0"
 
