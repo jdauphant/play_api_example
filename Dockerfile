@@ -19,4 +19,4 @@ RUN sbt clean
 RUN sbt compile
 
 EXPOSE 9000
-ENTRYPOINT ["sbt", "run"]
+CMD ["sbt", "run"]
