@@ -1,7 +1,6 @@
 import play.api._
 import play.api.mvc._
 import play.api.mvc.Results._
-import play.api.libs.json._
 import models.{User, TopLevel, Error}
 
 import scala.concurrent.Future
@@ -27,5 +26,5 @@ object Global extends GlobalSettings {
   override def onHandlerNotFound(request: RequestHeader) = {
     Future.successful(NotFound(Error.toTopLevelJson(Error("Handler not found, check the API documentation"))).as("application/vnd.api+json"))
   }
-
+  
 }
