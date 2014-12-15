@@ -29,6 +29,15 @@ object Users extends Controller {
     )
   }
 
+  def checkEmail(emailToTest: String) = Action.async { request =>
+    User.findByEmail(emailToTest).map {
+      case User(email, _, _, _) :: Nil if email == emailToTest =>
+        Ok(Json.toJson(TopLevel(users=Some(User(email, state=Some("exist")))))).as("application/vnd.api+json")
+      case _ =>
+        NotFound(Error.toTopLevelJson(Error("No user account for this email"))).as("application/vnd.api+json")
+    }
+  }
+
   def login = Action.async(BodyParsers.parse.tolerantJson) { request =>
     val userResult = request.body.validate[User]
     userResult.fold(
@@ -39,7 +48,7 @@ object Users extends Controller {
         User.findByEmail(userLogging.email).map { users => users match {
             case user :: Nil if userLogging.email == user.email && userLogging.password == user.password =>
               Ok(Json.toJson(TopLevel(users = Some(user)))).as("application/vnd.api+json")
-            case User(email, _, _) :: Nil if userLogging.email == email =>
+            case User(email, _, _, _) :: Nil if userLogging.email == email =>
               Unauthorized(Error.toTopLevelJson(Error("Incorrect password"))).as("application/vnd.api+json")
             case _ =>
               Unauthorized(Error.toTopLevelJson(Error("No user account for this email"))).as("application/vnd.api+json")
