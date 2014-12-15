@@ -2,10 +2,16 @@ name := """play-api-example"""
 
 version := "1.0"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file(".")).enablePlugins(play.PlayScala)
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
   cache
 )
+
+libraryDependencies ++= Seq(
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23"
+)
+
+PlayKeys.playWatchService := play.runsupport.PlayWatchService.sbt(pollInterval.value)

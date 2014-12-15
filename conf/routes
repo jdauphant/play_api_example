@@ -4,3 +4,5 @@
 
 # Home page
 GET     /                           controllers.Application.index
+POST    /users                      controllers.Users.create
+POST    /login                      controllers.Users.login

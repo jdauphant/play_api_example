@@ -6,4 +6,5 @@ case class Error(title: String, id: Option[String] = None, detail: Option[String
 
 object Error {
    val errorFormat = Json.format[Error]
+   def toTopLevelJson(error: Error) = Json.toJson(TopLevel(errors=Some(error)))
 }
