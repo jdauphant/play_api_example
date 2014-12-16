@@ -1,6 +1,7 @@
 package controllers
 
 import actions.JsonAPIAction
+import formats.APIJsonFormats
 import models._
 import play.api._
 import play.api.libs.json.{JsError, Json}
@@ -10,13 +11,10 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 
-object Users extends Controller {
-  implicit val userFormat = User.userFormat
-  implicit val errorFormat = Error.errorFormat
-  implicit val topLevelFormat = TopLevel.topLevelFormat
+object Users extends Controller with APIJsonFormats {
 
   def create = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
-    val userResult = request.body.validate[User]
+    val userResult = request.body.validate[NewUser]
     userResult.fold(
       errors => {
         Future.successful(BadRequest(Error.toTopLevelJson(Error(JsError.toFlatJson(errors).toString()))))
@@ -40,7 +38,7 @@ object Users extends Controller {
   }
 
   def login = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
-    val userResult = request.body.validate[User]
+    val userResult = request.body.validate[NewUser]
     userResult.fold(
       errors => {
         Future.successful(BadRequest(Error.toTopLevelJson(Error(JsError.toFlatJson(errors).toString()))))

@@ -26,5 +26,5 @@ object Global extends GlobalSettings {
   override def onHandlerNotFound(request: RequestHeader) = {
     Future.successful(NotFound(Error.toTopLevelJson(Error("Handler not found, check the API documentation"))).as("application/vnd.api+json"))
   }
-  
+
 }
