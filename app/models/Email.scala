@@ -1,5 +1,3 @@
 package models
 
-
-case class Email(email: String, status: String)
-
+case class Email(email: String, state: String)

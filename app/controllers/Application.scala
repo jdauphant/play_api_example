@@ -9,7 +9,7 @@ import play.api.mvc._
 object Application extends Controller with APIJsonFormats {
 
   def index = JsonAPIAction {
-    val services = Map("users"-> "/users")
+    val services = Map("users"-> "/users", "emails"-> "/emails")
   	Ok(Json.toJson(TopLevel(links=Some(services))))
   }
 

@@ -55,7 +55,7 @@ object Users extends Controller with APIJsonFormats {
             case User(email, Some(passwordHash), _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password.get,passwordHash) =>
               Ok(Json.toJson(TopLevel(users = Some(users.head))))
             case User(email, _, _, _) :: Nil if userLogging.email == email =>
-              Unauthorized(Error.toTopLevelJson(Error("Incorrect password")))
+              NotFound(Error.toTopLevelJson(Error("Incorrect password")))
             case _ =>
               Unauthorized(Error.toTopLevelJson(Error("No user account for this email")))
           }
