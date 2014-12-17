@@ -11,6 +11,9 @@ POST /users
     "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
 }
 ```
+## Notes
+- password is a sha256(email+":"+password)
+- password is not stored the same way as it's received :)
 ## Results
 ```
 HTTP/1.1 201 Created
@@ -86,13 +89,14 @@ POST /email/paul@example.com
     }
 }
 ```
+## Results
 ```
 HTTP/1.1 404 Not Found
 Content-Type: application/vnd.api+json
 
 {
    "errors": {
-      "title":"No user account associated to this email"
+      "title":"Email not found"
    }
 }
 ```

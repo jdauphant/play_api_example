@@ -40,7 +40,7 @@ object Users extends Controller with APIJsonFormats {
       case User(email, _, _, _) :: Nil if email == emailToTest =>
         Ok(Json.toJson(TopLevel(emails=Some(Email(email,"registered")))))
       case _ =>
-        NotFound(Error.toTopLevelJson(Error("No user account associated to this email")))
+        NotFound(Error.toTopLevelJson(Error("Email not found")))
     }
   }
 
