@@ -14,6 +14,7 @@ POST /users
 ## Notes
 - password is a sha256(email+":"+password)
 - password is not stored the same way as it's received :)
+
 ## Results
 ```
 HTTP/1.1 201 Created
