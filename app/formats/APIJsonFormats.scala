@@ -18,5 +18,6 @@ trait APIJsonFormats extends CommonJsonFormats {
   implicit val userRead = Json.reads[User]
 
   implicit val errorFormat = Json.format[Error]
+  implicit val emailFormat = Json.format[Email]
   implicit val topLevelFormat = Json.format[TopLevel]
 }

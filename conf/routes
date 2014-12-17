@@ -6,4 +6,4 @@
 GET     /                           controllers.Application.index
 POST    /users                      controllers.Users.create
 POST    /login                      controllers.Users.login
-GET     /email/:email               controllers.Users.checkEmail(email)
+GET     /emails/:email               controllers.Users.checkEmail(email)
