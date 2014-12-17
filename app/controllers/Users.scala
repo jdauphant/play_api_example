@@ -5,6 +5,7 @@ import formats.APIJsonFormats
 import models._
 import play.api._
 import play.api.libs.json.{JsError, Json}
+import utils.Hash
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc._
 
@@ -45,8 +46,8 @@ object Users extends Controller with APIJsonFormats {
       },
       userLogging => {
         User.findByEmail(userLogging.email).map { users => users match {
-            case user :: Nil if userLogging.email == user.email && userLogging.password == user.password =>
-              Ok(Json.toJson(TopLevel(users = Some(user))))
+            case User(email, Some(passwordHash), _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password.get,passwordHash) =>
+              Ok(Json.toJson(TopLevel(users = Some(users.head))))
             case User(email, _, _, _) :: Nil if userLogging.email == email =>
               Unauthorized(Error.toTopLevelJson(Error("Incorrect password")))
             case _ =>

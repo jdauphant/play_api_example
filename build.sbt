@@ -11,7 +11,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23"
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 PlayKeys.playWatchService := play.runsupport.PlayWatchService.sbt(pollInterval.value)
