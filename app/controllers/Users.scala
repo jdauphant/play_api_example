@@ -26,7 +26,7 @@ object Users extends Controller with APIJsonFormats {
         val newUser = User.fromNewUser(user)
         User.create(newUser).map { lastError =>
           Logger.debug(s"Successfully inserted with LastError: $lastError")
-          val token = Token.newTokenForUser(newUser._id)
+          val token = Token.newTokenForUser(newUser.id)
           Created(Json.toJson(TopLevel(users=Some(newUser))))
         }.recover {
           case exception: DatabaseException if exception.code.contains(11000) => Conflict(Error.toTopLevelJson(s"An user with email ${user.email} already exists"))
@@ -54,8 +54,8 @@ object Users extends Controller with APIJsonFormats {
       },
       userLogging => {
         User.findByEmail(userLogging.email).map { users => users match {
-            case User(email, passwordHash, _id, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
-              val token = Token.newTokenForUser(_id)
+            case User(email, passwordHash, id, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
+              val token = Token.newTokenForUser(id)
               Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
             case User(email, _, _, _) :: Nil if userLogging.email == email =>
               NotFound(Error.toTopLevelJson(Error("Incorrect password")))

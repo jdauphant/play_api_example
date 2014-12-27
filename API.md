@@ -22,7 +22,12 @@ Content-Type: application/vnd.api+json
 
 {
   "users": {
+     "id":"548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com"
+  },
+  "tokens": {
+     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
   }
 }
 ```
@@ -40,7 +45,7 @@ Content-Type: application/vnd.api+json
 # Login
 ## Request
 ```
-POST /login
+POST /tokens
 
 {
     "email" : "paul@example.com",
@@ -55,8 +60,12 @@ Content-Type: application/vnd.api+json
 
 {
   "users": {
-     "_id" : "548bf7d0e3bfc67d4d7c2cb6",
+     "id" : "548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com"
+  },
+  "tokens": {
+     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
   }
 }
 ```

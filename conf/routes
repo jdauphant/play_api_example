@@ -5,5 +5,5 @@
 # Home page
 GET     /                           controllers.Application.index
 POST    /users                      controllers.Users.create
-POST    /login                      controllers.Users.login
+POST    /tokens                      controllers.Users.login
 GET     /emails/:email               controllers.Users.checkEmail(email)
