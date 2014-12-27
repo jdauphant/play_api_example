@@ -52,7 +52,7 @@ object Users extends Controller with APIJsonFormats {
       },
       userLogging => {
         User.findByEmail(userLogging.email).map { users => users match {
-            case User(email, Some(passwordHash), _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password.get,passwordHash) =>
+            case User(email, passwordHash, _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
               Ok(Json.toJson(TopLevel(users = Some(users.head))))
             case User(email, _, _, _) :: Nil if userLogging.email == email =>
               NotFound(Error.toTopLevelJson(Error("Incorrect password")))
