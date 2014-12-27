@@ -13,7 +13,6 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-
 object Users extends Controller with APIJsonFormats {
 
   def create = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
@@ -65,5 +64,27 @@ object Users extends Controller with APIJsonFormats {
         }
       }
     )
+  }
+
+  val access_token_header = "ACCESS_TOKEN"
+  def get(id: String) = JsonAPIAction.async { request =>
+    request.headers.get(access_token_header) match {
+      case None =>
+        Future.successful(Unauthorized(Error.toTopLevelJson(Error(s"No token provided : use the Header '$access_token_header'"))))
+      case Some(access_token) =>
+        Token.findById(access_token).flatMap {
+          case Token(userId, _) :: Nil if id == userId =>
+            User.findById(id).map {
+              case user :: Nil =>
+                Ok(Json.toJson(TopLevel(users = Some(user))))
+              case _ =>
+                NotFound(Error.toTopLevelJson(Error(s"User $id not found")))
+            }
+          case Token(tokenUserId, _)  :: Nil if id != tokenUserId =>
+            Future.successful(Forbidden(Error.toTopLevelJson(Error("You can only retrieve the user associated with the token"))))
+          case _ =>
+            Future.successful(Unauthorized(Error.toTopLevelJson(Error(s"Unknown token $access_token"))))
+        }
+    }
   }
 }

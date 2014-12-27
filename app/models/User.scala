@@ -15,4 +15,5 @@ object User extends MongoModel("users") {
   def fromNewUser(newUser: NewUser): User = new User(newUser.email,Hash.bcrypt(newUser.password),BSONObjectID.generate.stringify)
 
   def create(user: User) = collection.insert(user)
+  def findById(id: String) = collection.find(Json.obj("_id" -> Json.obj("$oid" -> id))).cursor[User].collect[List]()
 }

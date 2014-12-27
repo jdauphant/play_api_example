@@ -3,7 +3,8 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-POST    /users                      controllers.Users.create
+GET     /                            controllers.Application.index
+POST    /users                       controllers.Users.create
+GET    /users/:id                   controllers.Users.get(id)
 POST    /tokens                      controllers.Users.login
 GET     /emails/:email               controllers.Users.checkEmail(email)
