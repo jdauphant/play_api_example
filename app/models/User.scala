@@ -1,7 +1,6 @@
 package models
 
 import play.api.libs.json.Json
-import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 import scala.concurrent.ExecutionContext.Implicits.global
