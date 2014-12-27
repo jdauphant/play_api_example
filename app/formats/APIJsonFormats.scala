@@ -10,9 +10,19 @@ trait APIJsonFormats extends CommonJsonFormats {
   implicit val objectIDWrite: Writes[BSONObjectID] = Writes{ (objectID: BSONObjectID) => JsString(objectID.stringify) }
   implicit val objectIDRead: Reads[BSONObjectID] = (JsPath \ "$oid").read[String].map(BSONObjectID(_))
 
+  def mongoReads[T](r: Reads[T]) = {
+    __.json.update((__ \ 'id).json.copyFrom((__ \ '_id \ '$oid).json.pick[JsString] )) andThen r
+  }
+
+  def mongoWrites[T](w : Writes[T]) = {
+    w.transform( js => js.as[JsObject] - "_id"  ++ Json.obj("id" -> (js \ "_id")) )
+  }
+
+  implicit val tokenWrites: Writes[Token] = mongoWrites[Token](Json.writes[Token])
+
   implicit val userWrite: Writes[User] = (
     (__ \ "email").write[String] and
-    (__ \ "_id").writeNullable[BSONObjectID] and
+    (__ \ "id").write[BSONObjectID] and
     (__ \ "state").writeNullable[String]
   )(user => (user.email, user._id, user.state))
 
