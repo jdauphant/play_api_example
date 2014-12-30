@@ -8,7 +8,8 @@ POST /users
 
 {
     "email" : "paul@example.com",
-    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"
+    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+    "username" : "paul.the.boss"
 }
 ```
 ## Notes
@@ -23,7 +24,8 @@ Content-Type: application/vnd.api+json
 {
   "users": {
      "id":"548bf7d0e3bfc67d4d7c2cb6",
-     "email":"paul@example.com"
+     "email":"paul@example.com",
+     "username" : "paul.the.boss"
   },
   "tokens": {
      "userId":"548bf7d0e3bfc67d4d7c2cb6",
@@ -42,7 +44,7 @@ Content-Type: application/vnd.api+json
 }
 ```
 
-# Login
+# Login by email
 ## Request
 ```
 POST /tokens
@@ -61,7 +63,8 @@ Content-Type: application/vnd.api+json
 {
   "users": {
      "id" : "548bf7d0e3bfc67d4d7c2cb6",
-     "email":"paul@example.com"
+     "email":"paul@example.com",
+     "username" : "paul.the.boss"
   },
   "tokens": {
      "userId":"548bf7d0e3bfc67d4d7c2cb6",
@@ -76,6 +79,55 @@ Content-Type: application/vnd.api+json
 {
    "errors": {
       "title":"No user account for this email"
+   }
+}
+```
+```
+HTTP/1.1 401 Unauthorized
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"Incorrect password"
+   }
+}
+```
+
+# Login by username
+## Request
+```
+POST /tokens
+
+{
+    "username" : "paul.the.boss",
+    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+}
+```
+
+## Results
+```
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+
+{
+  "users": {
+     "id" : "548bf7d0e3bfc67d4d7c2cb6",
+     "email":"paul@example.com",
+     "username" : "paul.the.boss"
+  },
+  "tokens": {
+     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
+  }
+}
+```
+```
+HTTP/1.1 404 Not Found
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"No user account for this username"
    }
 }
 ```
@@ -130,7 +182,8 @@ Content-Type: application/vnd.api+json
 {
   "users": {
      "id" : "548bf7d0e3bfc67d4d7c2cb6",
-     "email":"paul@example.com"
+     "email":"paul@example.com",
+     "username" : "paul.the.boss"
   }
 }
 ```

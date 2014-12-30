@@ -29,6 +29,7 @@ object Users extends Controller with APIJsonFormats {
           Created(Json.toJson(TopLevel(users=Some(newUser), tokens = Some(token))))
         }.recover {
           case exception: DatabaseException if exception.code.contains(11000) =>
+            Logger.debug("User already exist with database: "+exception.getMessage())
             Conflict(Error.toTopLevelJson(s"An user with email ${user.email} or username ${user.username} already exists"))
         }
       }
@@ -50,19 +51,39 @@ object Users extends Controller with APIJsonFormats {
       errors => {
         Future.successful(BadRequest(Error.toTopLevelJson(Error(JsError.toFlatJson(errors).toString()))))
       },
-      userLogging => {
-        User.findByEmail(userLogging.email).map { users => users match {
-            case User(email, passwordHash, id, _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
-              val token = Token.newTokenForUser(id)
-              Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-            case User(email, _, _, _, _) :: Nil if userLogging.email == email =>
-              NotFound(Error.toTopLevelJson(Error("Incorrect password")))
-            case _ =>
-              Unauthorized(Error.toTopLevelJson(Error("No user account for this email")))
-          }
-        }
+      userLogging => userLogging match {
+        case LoginUser(Some(loginEmail), loginPasswordHash, None) =>
+        loginByEmail(loginEmail, loginPasswordHash)
+        case LoginUser(None, loginPasswordHash, Some(loginUsername)) =>
+        loginByUsername(loginUsername, loginPasswordHash)
+        case _ =>
+          Future.successful(BadRequest(Error.toTopLevelJson(s"You can specified only username or email to login")))
       }
     )
+  }
+
+  def loginByEmail(loginEmail: String, loginPasswordHash: String): Future[Result] = User.findByEmail(loginEmail).map {
+    users => users match {
+      case User(email, passwordHash, id, _, _) :: Nil if loginEmail == email && Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+        val token = Token.newTokenForUser(id)
+        Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
+      case User(email, _, _, _, _) :: Nil if loginEmail == email =>
+        NotFound(Error.toTopLevelJson(Error("Incorrect password")))
+      case _ =>
+        Unauthorized(Error.toTopLevelJson(Error("No user account for this email")))
+    }
+  }
+
+  def loginByUsername(loginUsername: String, loginPasswordHash: String): Future[Result] = User.findByUsername(loginUsername).map {
+    users => users match {
+      case User(_, passwordHash, id, username, _) :: Nil if username == loginUsername && Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+        val token = Token.newTokenForUser(id)
+        Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
+      case User(_, _, _, username, _) :: Nil if username == loginUsername =>
+        NotFound(Error.toTopLevelJson(Error("Incorrect password")))
+      case _ =>
+        Unauthorized(Error.toTopLevelJson(Error("No user account for this username")))
+    }
   }
 
   val access_token_header = "X-Access-Token"

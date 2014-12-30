@@ -21,8 +21,9 @@ trait APIJsonFormats extends CommonJsonFormats {
   )(NewUser.apply _)
 
   implicit val loginUserRead: Reads[LoginUser]  = (
-    (__ \ "email").read[String](pattern(emailRegex, "Invalid email address")) and
-    (__ \ "password").read[String](pattern(sha256Regex, "Password should be sha256(email:password)"))
+    (__ \ "email").readNullable[String](pattern(emailRegex, "Invalid email address")) and
+    (__ \ "password").read[String](pattern(sha256Regex, "Password should be sha256(email:password)")) and
+    (__ \ "username").readNullable[String](pattern(usernameRegex, "Username should be from 2 to 20 characters and contains only 0-9a-zA-Z."))
   )(LoginUser.apply _)
 
   implicit val errorWrite = Json.writes[Error]
