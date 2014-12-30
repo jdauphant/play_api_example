@@ -8,7 +8,7 @@ POST /users
 
 {
     "email" : "paul@example.com",
-    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"
 }
 ```
 ## Notes
@@ -111,6 +111,47 @@ Content-Type: application/vnd.api+json
 {
    "errors": {
       "title":"Email not found"
+   }
+}
+```
+
+# Retrieve user information
+## Request
+```
+GET /users/548bf7d0e3bfc67d4d7c2cb6
+Content-Type: application/vnd.api+json
+X-Access-Token: fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc
+```
+
+## Results
+```
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+
+{
+  "users": {
+     "id" : "548bf7d0e3bfc67d4d7c2cb6",
+     "email":"paul@example.com"
+  }
+}
+```
+```
+HTTP/1.1 403 Forbidden
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"You can only retrieve the user associated with the token"
+   }
+}
+```
+```
+HTTP/1.1 401 Unauthorized
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"Unknown token fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
    }
 }
 ```
