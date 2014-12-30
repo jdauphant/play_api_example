@@ -119,7 +119,6 @@ Content-Type: application/vnd.api+json
 ## Request
 ```
 GET /users/548bf7d0e3bfc67d4d7c2cb6
-Content-Type: application/vnd.api+json
 X-Access-Token: fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc
 ```
 

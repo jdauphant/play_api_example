@@ -14,7 +14,7 @@ object Token extends MongoModel("tokens") {
   private def generatedId = Random.alphanumeric.take(TOKEN_ID_SIZE).mkString
   def newTokenForUser(userId: String) = {
     val token = new Token(userId, Token.generatedId)
-    create(token)
+    val futureToken = create(token)
     token
   }
 

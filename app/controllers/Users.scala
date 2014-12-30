@@ -26,11 +26,10 @@ object Users extends Controller with APIJsonFormats {
         User.create(newUser).map { lastError =>
           Logger.debug(s"Successfully inserted with LastError: $lastError")
           val token = Token.newTokenForUser(newUser.id)
-          Created(Json.toJson(TopLevel(users=Some(newUser))))
+          Created(Json.toJson(TopLevel(users=Some(newUser), tokens = Some(token))))
         }.recover {
-          case exception: DatabaseException if exception.code.contains(11000) => Conflict(Error.toTopLevelJson(s"An user with email ${user.email} already exists"))
-          case e: Throwable => Logger.error(s"Impossible to create user ${user.email} : $e.getMessage")
-            InternalServerError(Error.toTopLevelJson(Error("Internal api error, try later")))
+          case exception: DatabaseException if exception.code.contains(11000) =>
+            Conflict(Error.toTopLevelJson(s"An user with email ${user.email} or username ${user.username} already exists"))
         }
       }
     )
@@ -38,7 +37,7 @@ object Users extends Controller with APIJsonFormats {
 
   def checkEmail(emailToTest: String) = JsonAPIAction.async { request =>
     User.findByEmail(emailToTest).map {
-      case User(email, _, _, _) :: Nil if email == emailToTest =>
+      case User(email, _, _, _, _) :: Nil if email == emailToTest =>
         Ok(Json.toJson(TopLevel(emails=Some(Email(email,"registered")))))
       case _ =>
         NotFound(Error.toTopLevelJson(Error("Email not found")))
@@ -46,17 +45,17 @@ object Users extends Controller with APIJsonFormats {
   }
 
   def login = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
-    val userResult = request.body.validate[NewUser]
+    val userResult = request.body.validate[LoginUser]
     userResult.fold(
       errors => {
         Future.successful(BadRequest(Error.toTopLevelJson(Error(JsError.toFlatJson(errors).toString()))))
       },
       userLogging => {
         User.findByEmail(userLogging.email).map { users => users match {
-            case User(email, passwordHash, id, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
+            case User(email, passwordHash, id, _, _) :: Nil if userLogging.email == email && Hash.bcrypt_compare(userLogging.password,passwordHash) =>
               val token = Token.newTokenForUser(id)
               Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-            case User(email, _, _, _) :: Nil if userLogging.email == email =>
+            case User(email, _, _, _, _) :: Nil if userLogging.email == email =>
               NotFound(Error.toTopLevelJson(Error("Incorrect password")))
             case _ =>
               Unauthorized(Error.toTopLevelJson(Error("No user account for this email")))
@@ -66,7 +65,7 @@ object Users extends Controller with APIJsonFormats {
     )
   }
 
-  val access_token_header = "ACCESS_TOKEN"
+  val access_token_header = "X-Access-Token"
   def get(id: String) = JsonAPIAction.async { request =>
     request.headers.get(access_token_header) match {
       case None =>
@@ -87,4 +86,5 @@ object Users extends Controller with APIJsonFormats {
         }
     }
   }
+
 }
