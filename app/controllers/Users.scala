@@ -4,6 +4,7 @@ import actions.JsonAPIAction
 import formats.APIJsonFormats
 import models._
 import play.api._
+import play.api.i18n.Messages
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.Results._
 import reactivemongo.core.errors.DatabaseException
@@ -18,8 +19,8 @@ object Users extends Controller with APIJsonFormats {
   def create = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
     val userResult = request.body.validate[NewUser]
     userResult.fold(
-      errors => {
-        Future.successful(BadRequest(Error.toTopLevelJson(JsError.toFlatJson(errors).toString())))
+      validationErrors => {
+        Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
       },
       user => {
         val newUser = User.fromNewUser(user)
@@ -48,8 +49,8 @@ object Users extends Controller with APIJsonFormats {
   def login = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
     val userResult = request.body.validate[LoginUser]
     userResult.fold(
-      errors => {
-        Future.successful(BadRequest(Error.toTopLevelJson(Error(JsError.toFlatJson(errors).toString()))))
+      validationErrors => {
+        Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
       },
       userLogging => userLogging match {
         case LoginUser(Some(loginEmail), loginPasswordHash, None) =>
