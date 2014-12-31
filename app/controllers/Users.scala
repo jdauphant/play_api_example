@@ -29,9 +29,12 @@ object Users extends Controller with APIJsonFormats {
           val token = Token.newTokenForUser(newUser.id)
           Created(Json.toJson(TopLevel(users=Some(newUser), tokens = Some(token))))
         }.recover {
-          case exception: DatabaseException if exception.code.contains(11000) =>
-            Logger.debug("User already exist with database: "+exception.getMessage())
-            Conflict(Error.toTopLevelJson(s"An user with email ${user.email} or username ${user.username} already exists"))
+          case exception: DatabaseException if exception.code.contains(11000) && exception.getMessage().contains("emailUniqueIndex")=>
+            Logger.debug("email already exist with database: "+exception.getMessage())
+            Conflict(Error.toTopLevelJson(s"An user with email ${user.email} already exists"))
+          case exception: DatabaseException if exception.code.contains(11000) && exception.getMessage().contains("usernameUniqueIndex")=>
+            Logger.debug("username already exist with database: "+exception.getMessage())
+            Conflict(Error.toTopLevelJson(s"An user with username ${user.username} already exists"))
         }
       }
     )
