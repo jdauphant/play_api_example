@@ -44,6 +44,18 @@ Content-Type: application/vnd.api+json
 }
 ```
 
+```
+HTTP/1.1 400 Bad Request
+Content-Type: application/vnd.api+json
+{
+    "errors" : [
+        {"title":"error with field /email : invalid email address"},
+        {"title":"error with field /username : should be from 2 to 20 characters and contains only 0-9a-zA-Z."},
+        {"title":"error with field /password : invalid sha256"}
+    ]
+}
+```
+
 # Login by email
 ## Request
 ```

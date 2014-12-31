@@ -108,5 +108,4 @@ object Users extends Controller with APIJsonFormats {
         }
     }
   }
-
 }
