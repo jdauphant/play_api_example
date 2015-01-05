@@ -13,7 +13,7 @@ POST /users
 }
 ```
 ## Notes
-- password is a sha256(email+":"+password)
+- password is a sha256(password+":app_name:"+length(password))
 - password is not stored the same way as it's received :)
 
 ## Results
@@ -25,10 +25,14 @@ Content-Type: application/vnd.api+json
   "users": {
      "id":"548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com",
-     "username" : "paul.the.boss"
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
   },
   "tokens": {
-     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "user" : {
+        "id" : "548bf7d0e3bfc67d4d7c2cb6",
+        "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
+     },
      "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
   }
 }
@@ -76,10 +80,14 @@ Content-Type: application/vnd.api+json
   "users": {
      "id" : "548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com",
-     "username" : "paul.the.boss"
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
   },
   "tokens": {
-     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "user" : {
+              "id" : "548bf7d0e3bfc67d4d7c2cb6",
+              "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
+     },
      "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
   }
 }
@@ -125,10 +133,14 @@ Content-Type: application/vnd.api+json
   "users": {
      "id" : "548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com",
-     "username" : "paul.the.boss"
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
   },
   "tokens": {
-     "userId":"548bf7d0e3bfc67d4d7c2cb6",
+     "user" : {
+              "id" : "548bf7d0e3bfc67d4d7c2cb6",
+              "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
+     },
      "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
   }
 }
@@ -195,7 +207,8 @@ Content-Type: application/vnd.api+json
   "users": {
      "id" : "548bf7d0e3bfc67d4d7c2cb6",
      "email":"paul@example.com",
-     "username" : "paul.the.boss"
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
   }
 }
 ```

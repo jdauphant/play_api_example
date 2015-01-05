@@ -1,15 +1,32 @@
 package formats
 
 import models._
+import play.api.Play
+import play.api.Play.current
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import reactivemongo.bson.BSONObjectID
 
 trait APIJsonFormats extends CommonJsonFormats {
-  implicit val tokenWrites: Writes[Token] = Json.writes[Token]
+  implicit def traversableWrites[A: Writes] = new Writes[Traversable[A]] {
+    def writes(as: Traversable[A]) = JsArray(as.map(Json.toJson(_)).toSeq)
+  }
 
-  implicit val userWrite: Writes[User] = Json.writes[User].transform( js => js.as[JsObject] - "passwordHash" )
+  def addHref[T](endpoint: String, w : Writes[T]): Writes[T] = w.transform {
+    js =>
+      js.as[JsObject] ++
+      Json.obj("href" -> JsString(endpoint + (js \ "id").as[String]))
+  }
+
+  implicit val tokenWrites: Writes[Token] = addHref("/tokens/",Json.writes[Token].transform{
+    js => js.as[JsObject] - "userId" ++
+      Json.obj("user" ->
+        Json.obj("id" ->  js \ "userId",
+        "href" -> JsString("/users/" + (js \ "userId").as[String])))
+  })
+
+  implicit val userWrite: Writes[User] = addHref("/users/",Json.writes[User].transform( js => js.as[JsObject] - "passwordHash" ))
 
   private val sha256Regex = "[0-9a-z]{64}".r
   private val emailRegex = """^(?!\.)("([^"\r\\]|\\["\r\\])*"|([-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$""".r
@@ -27,7 +44,7 @@ trait APIJsonFormats extends CommonJsonFormats {
   )(LoginUser.apply _)
 
   implicit val errorWrite = Json.writes[Error]
-  implicit val emailWrite = Json.writes[Email]
+  implicit val emailWrite = addHref("/emails/",Json.writes[Email])
   implicit val topLevelWrite = Json.writes[TopLevel]
 
 }
