@@ -15,6 +15,7 @@ RUN chown -R play_app:play_app $PLAY_APP_DIR
 
 WORKDIR $PLAY_APP_DIR
 USER play_app
+ENV HOME $PLAY_APP_DIR
 RUN sbt clean 
 RUN sbt compile
 
