@@ -40,9 +40,9 @@ object Users extends Controller with APIJsonFormats {
     )
   }
 
-  def checkEmail(emailToTest: String) = JsonAPIAction.async { request =>
-    User.findByEmail(emailToTest).map {
-      case User(email, _, _, _, _) :: Nil if email == emailToTest =>
+  def checkEmail(email: String) = JsonAPIAction.async { request =>
+    User.findByEmail(email).map {
+      case User(`email`, _, _, _, _) :: Nil =>
         Ok(Json.toJson(TopLevel(emails=Some(Email(email,"registered")))))
       case _ =>
         NotFound(Error.toTopLevelJson(Error("Email not found")))
@@ -55,7 +55,7 @@ object Users extends Controller with APIJsonFormats {
       validationErrors => {
         Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
       },
-      userLogging => userLogging match {
+      loginUser => loginUser match {
         case LoginUser(Some(loginEmail), loginPasswordHash, None) =>
         loginByEmail(loginEmail, loginPasswordHash)
         case LoginUser(None, loginPasswordHash, Some(loginUsername)) =>
@@ -66,24 +66,24 @@ object Users extends Controller with APIJsonFormats {
     )
   }
 
-  def loginByEmail(loginEmail: String, loginPasswordHash: String): Future[Result] = User.findByEmail(loginEmail).map {
+  def loginByEmail(email: String, loginPasswordHash: String): Future[Result] = User.findByEmail(email).map {
     users => users match {
-      case User(email, passwordHash, id, _, _) :: Nil if loginEmail == email && Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+      case User(`email`, passwordHash, id, _, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
         val token = Token.newTokenForUser(id)
         Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-      case User(email, _, _, _, _) :: Nil if loginEmail == email =>
+      case User(`email`, _, _, _, _) :: Nil =>
         NotFound(Error.toTopLevelJson(Error("Incorrect password")))
       case _ =>
         Unauthorized(Error.toTopLevelJson(Error("No user account for this email")))
     }
   }
 
-  def loginByUsername(loginUsername: String, loginPasswordHash: String): Future[Result] = User.findByUsername(loginUsername).map {
+  def loginByUsername(username: String, loginPasswordHash: String): Future[Result] = User.findByUsername(username).map {
     users => users match {
-      case User(_, passwordHash, id, username, _) :: Nil if username == loginUsername && Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+      case User(_, passwordHash, id, `username`, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
         val token = Token.newTokenForUser(id)
         Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-      case User(_, _, _, username, _) :: Nil if username == loginUsername =>
+      case User(_, _, _, `username`, _) :: Nil =>
         NotFound(Error.toTopLevelJson(Error("Incorrect password")))
       case _ =>
         Unauthorized(Error.toTopLevelJson(Error("No user account for this username")))
@@ -97,7 +97,7 @@ object Users extends Controller with APIJsonFormats {
         Future.successful(Unauthorized(Error.toTopLevelJson(Error(s"No token provided : use the Header '$access_token_header'"))))
       case Some(access_token) =>
         Token.findById(access_token).flatMap {
-          case Token(userId, _) :: Nil if id == userId =>
+          case Token(`id`, _) :: Nil =>
             User.findById(id).map {
               case user :: Nil =>
                 Ok(Json.toJson(TopLevel(users = Some(user))))
