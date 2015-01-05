@@ -7,9 +7,11 @@ API Specs
 POST /users
 
 {
+  "users": {
     "email" : "paul@example.com",
     "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
     "username" : "paul.the.boss"
+  }
 }
 ```
 ## Notes
@@ -66,8 +68,10 @@ Content-Type: application/vnd.api+json
 POST /tokens
 
 {
+  "users": {
     "email" : "paul@example.com",
-    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"
+  }
 }
 ```
 
@@ -119,8 +123,10 @@ Content-Type: application/vnd.api+json
 POST /tokens
 
 {
+  "users": {
     "username" : "paul.the.boss",
-    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e",
+    "password" : "6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"
+  }
 }
 ```
 
@@ -168,18 +174,25 @@ Content-Type: application/vnd.api+json
 
 # Check if an email is already used
 ## Request
+
 ```
-POST /email/paul@example.com
+GET /emails/paul@example.com
+```
+
+## Results
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
 
 {
     "emails": {
-       "email" : "paul@example.com",
+       "id" : "paul@example.com",
        "state" : "registered"
     }
 }
 ```
 
-## Results
 ```
 HTTP/1.1 404 Not Found
 Content-Type: application/vnd.api+json

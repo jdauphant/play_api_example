@@ -17,7 +17,7 @@ import scala.concurrent.Future
 object Users extends Controller with APIJsonFormats {
 
   def create = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
-    val userResult = request.body.validate[NewUser]
+    val userResult = (request.body \ "users").validate[NewUser]
     userResult.fold(
       validationErrors => {
         Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
@@ -50,7 +50,7 @@ object Users extends Controller with APIJsonFormats {
   }
 
   def login = JsonAPIAction.async(BodyParsers.parse.tolerantJson) { request =>
-    val userResult = request.body.validate[LoginUser]
+    val userResult = (request.body \ "users").validate[LoginUser]
     userResult.fold(
       validationErrors => {
         Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
