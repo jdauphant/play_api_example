@@ -13,20 +13,23 @@ trait APIJsonFormats extends CommonJsonFormats {
     def writes(as: Traversable[A]) = JsArray(as.map(Json.toJson(_)).toSeq)
   }
 
-  def addHref[T](endpoint: String, w : Writes[T]): Writes[T] = w.transform {
+  def addHref[T](objType: String, w : Writes[T]): Writes[T] = w.transform {
     js =>
       js.as[JsObject] ++
-      Json.obj("href" -> JsString(endpoint + (js \ "id").as[String]))
+      Json.obj("href" -> JsString("/%s/%s".format(objType,(js \ "id").as[String])),
+      "type" -> objType
+      )
   }
 
-  implicit val tokenWrites: Writes[Token] = addHref("/tokens/",Json.writes[Token].transform{
+  implicit val tokenWrites: Writes[Token] = addHref("tokens",Json.writes[Token].transform{
     js => js.as[JsObject] - "userId" ++
       Json.obj("user" ->
         Json.obj("id" ->  js \ "userId",
-        "href" -> JsString("/users/" + (js \ "userId").as[String])))
+        "href" -> JsString("/users/" + (js \ "userId").as[String]),
+        "type" -> "users"))
   })
 
-  implicit val userWrite: Writes[User] = addHref("/users/",Json.writes[User].transform( js => js.as[JsObject] - "passwordHash" ))
+  implicit val userWrite: Writes[User] = addHref("users",Json.writes[User].transform( js => js.as[JsObject] - "passwordHash" ))
 
   private val sha256Regex = "[0-9a-z]{64}".r
   private val emailRegex = """^(?!\.)("([^"\r\\]|\\["\r\\])*"|([-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$""".r
@@ -44,7 +47,7 @@ trait APIJsonFormats extends CommonJsonFormats {
   )(LoginUser.apply _)
 
   implicit val errorWrite = Json.writes[Error]
-  implicit val emailWrite = addHref("/emails/",Json.writes[Email])
+  implicit val emailWrite = addHref("emails",Json.writes[Email])
   implicit val topLevelWrite = Json.writes[TopLevel]
 
 }
