@@ -8,6 +8,7 @@ Example of API with play framework 2.3 that use mongodb
 - Vagrant
 - Docker
 - BCrypt
+- Spracebook
 
 # Commands :
 ## Run the app in test

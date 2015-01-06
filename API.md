@@ -62,6 +62,64 @@ Content-Type: application/vnd.api+json
 }
 ```
 
+# Create an user with facebook
+## Request
+```
+POST /users
+
+{
+  "users": {
+    "email" : "paul@example.com",
+    "facebookToken" : "CAADOJKDKJLDJMLDSKdsklokfdmlgdfpo878UNKJnkjnNKJNKJNIUG6T56789jtyR5YU7Hyuitusijfddslofj6789ihjnkjTYChg56789NJUhbvgtcyr67yuvgft",
+    "username" : "paul.the.boss"
+  }
+}
+```
+
+## Results
+```
+HTTP/1.1 201 Created
+Content-Type: application/vnd.api+json
+
+{
+  "users": {
+     "id":"548bf7d0e3bfc67d4d7c2cb6",
+     "email":"paul@example.com",
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6",
+     "facebookUserId" : "15678999767689"
+  },
+  "tokens": {
+     "user" : {
+        "id" : "548bf7d0e3bfc67d4d7c2cb6",
+        "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
+     },
+     "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
+  }
+}
+```
+```
+HTTP/1.1 409 Conflict
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"An user with facebookUserId 15678999767689 already exists"
+   }
+}
+```
+
+```
+HTTP/1.1 400 Bad Request
+Content-Type: application/vnd.api+json
+{
+    "errors" : [
+        {"title":"error with field /email : invalid email address"},
+        {"title":"error with field /password : invalid sha256"}
+    ]
+}
+```
+
 # Login by email
 ## Request
 ```
@@ -168,6 +226,52 @@ Content-Type: application/vnd.api+json
 {
    "errors": {
       "title":"Incorrect password"
+   }
+}
+```
+
+# Login by facebook
+## Request
+```
+POST /tokens
+
+{
+  "users": {
+     "facebookToken" : "CAADOJKDKJLDJMLDSKdsklokfdmlgdfpo878UNKJnkjnNKJNKJNIUG6T56789jtyR5YU7Hyuitusijfddslofj6789ihjnkjTYChg56789NJUhbvgtcyr67yuvgft",
+  }
+}
+```
+
+## Results
+```
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+
+{
+  "users": {
+     "id" : "548bf7d0e3bfc67d4d7c2cb6",
+     "email":"paul@example.com",
+     "username" : "paul.the.boss",
+     "href" : "/users/548bf7d0e3bfc67d4d7c2cb6",
+     "facebookUserId" : "15678999767689"
+  },
+  "tokens": {
+     "user" : {
+              "id" : "548bf7d0e3bfc67d4d7c2cb6",
+              "href" : "/users/548bf7d0e3bfc67d4d7c2cb6"
+     },
+     "id":"fuEyvqImw2xbywewZAUHkFMo8xJO7eSOAOjkaRRSTTfzRTqdblN65Mx7O2JhmzVc"
+  }
+}
+```
+
+```
+HTTP/1.1 404 Not Found
+Content-Type: application/vnd.api+json
+
+{
+   "errors": {
+      "title":"No user account for the facebookUserId associated to this facebookToken"
    }
 }
 ```
