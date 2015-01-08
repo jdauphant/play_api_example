@@ -5,6 +5,7 @@ import actions.{TokenCheckAction, JsonAPI}
 import akka.actor.ActorSystem
 import akka.io.IO
 import akka.util.Timeout
+import play.api.libs.concurrent.Akka
 import spray.can.Http
 import spracebook._
 import spracebook.Exceptions._
@@ -143,7 +144,7 @@ object Users extends Controller with APIJsonFormats {
   }
 
   def retrieveFacebookUserId(facebookToken: String): Future[String] = {
-    implicit val system = ActorSystem()
+    implicit val system = Akka.system
     implicit val timeout = Timeout(10 seconds)
 
     val facebook: Future[SprayClientFacebookGraphApi] = for {
