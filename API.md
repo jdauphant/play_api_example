@@ -15,7 +15,7 @@ POST /users
 }
 ```
 ## Notes
-- password is a sha256(password+":app_name:"+length(password))
+- password is a sha256(password+salt)
 - password is not stored the same way as it's received :)
 
 ## Results
@@ -75,6 +75,8 @@ POST /users
   }
 }
 ```
+## Notes
+- email and username are optional
 
 ## Results
 ```

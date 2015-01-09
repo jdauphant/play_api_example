@@ -6,8 +6,8 @@ import reactivemongo.bson.BSONObjectID
 import utils.Hash
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class User(email: String, passwordHash: Option[String], id: String, username: String, facebookToken: Option[String], facebookUserId: Option[String], state: Option[String] = None)
-case class NewUser(email: String, password: Option[String], username: String, facebookToken: Option[String])
+case class User(email: Option[String], passwordHash: Option[String], id: String, username: Option[String], facebookToken: Option[String], facebookUserId: Option[String], state: Option[String] = None)
+case class NewUser(email: Option[String], password: Option[String], username: Option[String], facebookToken: Option[String])
 case class LoginUser(email: Option[String], password: Option[String], username: Option[String], facebookToken: Option[String])
 
 object User extends MongoModel("users") {
@@ -30,5 +30,4 @@ object User extends MongoModel("users") {
   def findByEmail(email: String) = collection.find(Json.obj("email" -> email)).cursor[User].collect[List]()
   def findByUsername(username: String) = collection.find(Json.obj("username" -> username)).cursor[User].collect[List]()
   def findByFacebookUserId(facebookUserId: String) = collection.find(Json.obj("facebookUserId" -> facebookUserId)).cursor[User].collect[List]()
-
 }

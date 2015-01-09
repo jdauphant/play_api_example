@@ -36,9 +36,9 @@ trait APIJsonFormats extends CommonJsonFormats {
   private val usernameRegex = "[0-9a-zA-Z.]{2,20}".r
   private val facebookTokenRegex = "[^;\t\n]{1,1024}".r
   implicit val newUserRead: Reads[NewUser]  = (
-    (__ \ "email").read[String](pattern(emailRegex, "error.email")) and
+    (__ \ "email").readNullable[String](pattern(emailRegex, "error.email")) and
     (__ \ "password").readNullable[String](pattern(sha256Regex, "error.sha256")) and
-    (__ \ "username").read[String](pattern(usernameRegex, "error.username")) and
+    (__ \ "username").readNullable[String](pattern(usernameRegex, "error.username")) and
     (__ \ "facebookToken").readNullable[String](pattern(facebookTokenRegex, "error.facebookToken"))
     )(NewUser.apply _)
 
