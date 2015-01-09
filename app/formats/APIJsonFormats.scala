@@ -22,11 +22,7 @@ trait APIJsonFormats extends CommonJsonFormats {
   }
 
   implicit val tokenWrites: Writes[Token] = addHref("tokens",Json.writes[Token].transform{
-    js => js.as[JsObject] - "userId" ++
-      Json.obj("user" ->
-        Json.obj("id" ->  js \ "userId",
-        "href" -> JsString("/users/" + (js \ "userId").as[String]),
-        "type" -> "users"))
+    js => js.as[JsObject] - "userId"
   })
 
   implicit val userWrite: Writes[User] = addHref("users",Json.writes[User].transform( js => js.as[JsObject] - "passwordHash" - "facebookToken"))
