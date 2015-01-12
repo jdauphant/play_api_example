@@ -12,8 +12,8 @@ case class LoggingAction[A](action: Action[A]) extends Action[A] {
       lazy val message = "%s %s %s => %s".format(request.method,request.path, request.body.toString, result.header.status)
       if(result.header.status >= 400)
         Logger.error(message)
-      else if(Logger.isTraceEnabled)
-        Logger.trace(message)
+      else if(Logger.isDebugEnabled)
+        Logger.debug(message)
       result
     }
   }

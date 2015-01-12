@@ -26,26 +26,28 @@ import scala.concurrent.Future
 
 object Users extends Controller with APIJsonFormats {
 
-  def create = LoggingAction{ JsonAPIAction{ Action.async(BodyParsers.parse.tolerantJson) { request =>
-      val userResult = (request.body \ "users").validate[NewUser]
-      userResult.fold(
-        validationErrors => {
-          Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
-        },
-        user => user match {
-          case NewUser(Some(email), Some(passwordHash), _, None) =>
-            createUserByEmail(user)
-          case NewUser(_, None, _, Some(facebookToken)) =>
-            createUserByFacebook(user,facebookToken)
-          case NewUser(None, Some(passwordHash), _, None) =>
-            Future.successful(BadRequest(Error.toTopLevelJson(s"error with field /email : field missing")))
-          case _ =>
-            Logger.debug(s"Impossible to register ${user}")
-            Future.successful(BadRequest(Error.toTopLevelJson(s"You have to specified password or facebookToken to create an user")))
-        }
-      )
+  def create = LoggingAction{
+    JsonAPIAction{
+      Action.async(BodyParsers.parse.tolerantJson) { request =>
+        val userResult = (request.body \ "users").validate[NewUser]
+        userResult.fold(
+          validationErrors => {
+            Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
+          },
+          user => user match {
+            case NewUser(Some(email), Some(passwordHash), _, None) =>
+              createUserByEmail(user)
+            case NewUser(_, None, _, Some(facebookToken)) =>
+              createUserByFacebook(user,facebookToken)
+            case NewUser(None, Some(passwordHash), _, None) =>
+              Future.successful(BadRequest(Error.toTopLevelJson(s"error with field /email : field missing")))
+            case _ =>
+              Logger.debug(s"Impossible to register ${user}")
+              Future.successful(BadRequest(Error.toTopLevelJson(s"You have to specified password or facebookToken to create an user")))
+          }
+        )
+      }
     }
-  }
   }
 
   def createUserByEmail(user: NewUser): Future[Result] = {
@@ -86,35 +88,38 @@ object Users extends Controller with APIJsonFormats {
     }
   }
 
-  def checkEmail(email: String) = JsonAPIAction {
-    Action.async { request =>
-      User.findByEmail(email).map {
-        case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
-          Ok(Json.toJson(TopLevel(emails = Some(Email(email, "registered")))))
-        case _ =>
-          NotFound(Error.toTopLevelJson(Error("Email not found")))
+  def checkEmail(email: String) = LoggingAction{ JsonAPIAction {
+      Action.async { request =>
+        User.findByEmail(email).map {
+          case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
+            Ok(Json.toJson(TopLevel(emails = Some(Email(email, "registered")))))
+          case _ =>
+            NotFound(Error.toTopLevelJson(Error("Email not found")))
+        }
       }
     }
   }
 
-  def login = JsonAPIAction {
-    Action.async(BodyParsers.parse.tolerantJson) { request =>
-      val userResult = (request.body \ "users").validate[LoginUser]
-      userResult.fold(
-        validationErrors => {
-          Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
-        },
-        loginUser => loginUser match {
-          case LoginUser(Some(email), Some(passwordHash), None, None) =>
-            loginByEmail(email, passwordHash)
-          case LoginUser(None, Some(passwordHash), Some(username), None) =>
-            loginByUsername(username, passwordHash)
-          case LoginUser(None, None, None, Some(facebookToken)) =>
-            loginByFacebook(facebookToken)
-          case _ =>
-            Future.successful(BadRequest(Error.toTopLevelJson(s"You can specified only username/passwordHash, email/passwordHash or facebookToken to login")))
-        }
-      )
+  def login = LoggingAction {
+    JsonAPIAction {
+      Action.async(BodyParsers.parse.tolerantJson) { request =>
+        val userResult = (request.body \ "users").validate[LoginUser]
+        userResult.fold(
+          validationErrors => {
+            Future.successful(BadRequest(Error.toTopLevelJson(validationErrors)))
+          },
+          loginUser => loginUser match {
+            case LoginUser(Some(email), Some(passwordHash), None, None) =>
+              loginByEmail(email, passwordHash)
+            case LoginUser(None, Some(passwordHash), Some(username), None) =>
+              loginByUsername(username, passwordHash)
+            case LoginUser(None, None, None, Some(facebookToken)) =>
+              loginByFacebook(facebookToken)
+            case _ =>
+              Future.successful(BadRequest(Error.toTopLevelJson(s"You can specified only username/passwordHash, email/passwordHash or facebookToken to login")))
+          }
+        )
+      }
     }
   }
 
@@ -187,7 +192,8 @@ object Users extends Controller with APIJsonFormats {
 
   val access_token_header = Play.configuration.getString("api.accesstokenheader").get
 
-  def get(id: String) = JsonAPIAction {
+  def get(id: String) = LoggingAction {
+    JsonAPIAction {
       TokenCheckAction.async { request =>
         User.findById(id).map {
           case user :: Nil =>
@@ -197,4 +203,5 @@ object Users extends Controller with APIJsonFormats {
         }
       }
     }
+  }
 }
