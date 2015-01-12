@@ -16,9 +16,7 @@ trait APIJsonFormats extends CommonJsonFormats {
   def addHref[T](objType: String, w : Writes[T]): Writes[T] = w.transform {
     js =>
       js.as[JsObject] ++
-      Json.obj("href" -> JsString("/%s/%s".format(objType,(js \ "id").as[String])),
-      "type" -> objType
-      )
+      Json.obj("href" -> JsString("/%s/%s".format(objType,(js \ "id").as[String])))
   }
 
   implicit val tokenWrites: Writes[Token] = addHref("tokens",Json.writes[Token].transform{
