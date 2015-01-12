@@ -2,7 +2,7 @@ FROM jdauphant/sbt
 
 MAINTAINER Julien DAUPHANT
 
-ENV PLAY_APP_NAME play_api_example
+ENV PLAY_APP_NAME play-api-example
 ENV PLAY_APP_DIR /var/www/$PLAY_APP_NAME
 RUN mkdir -p $PLAY_APP_DIR
 COPY build.sbt $PLAY_APP_DIR/
@@ -19,4 +19,4 @@ ENV HOME $PLAY_APP_DIR
 RUN sbt clean stage
 
 EXPOSE 9000
-CMD sbt -mem 512 start
+CMD ["sh", "-c", "$PLAY_APP_DIR/target/universal/stage/bin/$PLAY_APP_NAME"]
