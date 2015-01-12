@@ -13,12 +13,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "yungsang/boot2docker"
   config.vm.synced_folder ".", "/vagrant"
   config.vm.network :forwarded_port, host: 9000, guest: 9000
+  config.vm.network "private_network", ip: "192.168.200.42"
 
   config.vm.provision "docker" do |d|
     d.pull_images "mongo"
-    d.build_image "/vagrant", args: "-t play_api_example"
+    d.pull_images "jdauphant/play-api-example"
     d.run "mongo"
-    d.run "play_api_example",
+    d.run "play-api-example",
+       cmd: "sbt run",
        args: "-t -p 9000:9000 -v /vagrant:/var/www/play_api_example --link mongo:mongo"
   end
 
