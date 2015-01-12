@@ -1,15 +1,14 @@
 package controllers
 
-import actions.{TokenCheckAction, JsonAPI}
+import actions.{LoggingAction, TokenCheckAction, JsonAPIAction}
 
-import akka.actor.ActorSystem
 import akka.io.IO
 import akka.util.Timeout
+import akka.pattern.ask
 import play.api.libs.concurrent.Akka
 import spray.can.Http
-import spracebook._
+import spracebook.SprayClientFacebookGraphApi
 import spracebook.Exceptions._
-import akka.pattern.ask
 
 import formats.APIJsonFormats
 import models._
@@ -27,7 +26,7 @@ import scala.concurrent.Future
 
 object Users extends Controller with APIJsonFormats {
 
-  def create = JsonAPI{ Action.async(BodyParsers.parse.tolerantJson) { request =>
+  def create = LoggingAction{ JsonAPIAction{ Action.async(BodyParsers.parse.tolerantJson) { request =>
       val userResult = (request.body \ "users").validate[NewUser]
       userResult.fold(
         validationErrors => {
@@ -46,6 +45,7 @@ object Users extends Controller with APIJsonFormats {
         }
       )
     }
+  }
   }
 
   def createUserByEmail(user: NewUser): Future[Result] = {
@@ -86,7 +86,7 @@ object Users extends Controller with APIJsonFormats {
     }
   }
 
-  def checkEmail(email: String) = JsonAPI {
+  def checkEmail(email: String) = JsonAPIAction {
     Action.async { request =>
       User.findByEmail(email).map {
         case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
@@ -97,7 +97,7 @@ object Users extends Controller with APIJsonFormats {
     }
   }
 
-  def login = JsonAPI {
+  def login = JsonAPIAction {
     Action.async(BodyParsers.parse.tolerantJson) { request =>
       val userResult = (request.body \ "users").validate[LoginUser]
       userResult.fold(
@@ -187,7 +187,7 @@ object Users extends Controller with APIJsonFormats {
 
   val access_token_header = Play.configuration.getString("api.accesstokenheader").get
 
-  def get(id: String) = JsonAPI {
+  def get(id: String) = JsonAPIAction {
       TokenCheckAction.async { request =>
         User.findById(id).map {
           case user :: Nil =>
