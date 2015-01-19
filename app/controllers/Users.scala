@@ -1,6 +1,6 @@
 package controllers
 
-import actions.{LoggingAction, TokenCheckAction, JsonAPIAction}
+import actions.{LoggingAction, TokenCheckAction}
 
 import akka.io.IO
 import akka.util.Timeout
@@ -27,7 +27,6 @@ import scala.concurrent.Future
 object Users extends Controller with APIJsonFormats {
 
   def create = LoggingAction{
-    JsonAPIAction{
       Action.async(BodyParsers.parse.tolerantJson) { request =>
         val userResult = (request.body \ "users").validate[NewUser]
         userResult.fold(
@@ -38,7 +37,7 @@ object Users extends Controller with APIJsonFormats {
             case NewUser(Some(email), Some(passwordHash), _, None) =>
               createUserByEmail(user)
             case NewUser(_, None, _, Some(facebookToken)) =>
-              createUserByFacebook(user,facebookToken)
+              createUserByFacebook(user, facebookToken)
             case NewUser(None, Some(passwordHash), _, None) =>
               Future.successful(BadRequest(Error.toTopLevelJson(s"error with field /email : field missing")))
             case _ =>
@@ -47,7 +46,6 @@ object Users extends Controller with APIJsonFormats {
           }
         )
       }
-    }
   }
 
   def createUserByEmail(user: NewUser): Future[Result] = {
@@ -88,7 +86,7 @@ object Users extends Controller with APIJsonFormats {
     }
   }
 
-  def checkEmail(email: String) = LoggingAction{ JsonAPIAction {
+  def checkEmail(email: String) = LoggingAction{
       Action.async { request =>
         User.findByEmail(email).map {
           case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
@@ -97,11 +95,9 @@ object Users extends Controller with APIJsonFormats {
             NotFound(Error.toTopLevelJson(Error("Email not found")))
         }
       }
-    }
   }
 
   def login = LoggingAction {
-    JsonAPIAction {
       Action.async(BodyParsers.parse.tolerantJson) { request =>
         val userResult = (request.body \ "users").validate[LoginUser]
         userResult.fold(
@@ -120,7 +116,6 @@ object Users extends Controller with APIJsonFormats {
           }
         )
       }
-    }
   }
 
   def loginByEmail(email: String, loginPasswordHash: String): Future[Result] = User.findByEmail(email).map {
@@ -193,7 +188,6 @@ object Users extends Controller with APIJsonFormats {
   val access_token_header = Play.configuration.getString("api.accesstokenheader").get
 
   def get(id: String) = LoggingAction {
-    JsonAPIAction {
       TokenCheckAction.async { request =>
         User.findById(id).map {
           case user :: Nil =>
@@ -202,6 +196,5 @@ object Users extends Controller with APIJsonFormats {
             NotFound(Error.toTopLevelJson(Error(s"User $id not found")))
         }
       }
-    }
   }
 }
