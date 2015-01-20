@@ -4,4 +4,4 @@ scala:
 services:
   - mongodb
 before_script:
-  - echo "127.0.0.2   mongo" >> /etc/hosts
+  - sudo sh -c "echo '127.0.0.2   mongo' >> /etc/hosts"
