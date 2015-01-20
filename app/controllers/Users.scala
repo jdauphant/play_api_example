@@ -23,6 +23,7 @@ import utils.Hash
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.language.postfixOps
 
 object Users extends Controller with APIJsonFormats {
 
@@ -89,7 +90,7 @@ object Users extends Controller with APIJsonFormats {
   def checkEmail(email: String) = LoggingAction{
       Action.async { request =>
         User.findByEmail(email).map {
-          case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
+          case User(Some(`email`), _, _, _, _, _, _, _) :: Nil =>
             Ok(Json.toJson(TopLevel(emails = Some(Email(email, "registered")))))
           case _ =>
             NotFound(Error.toTopLevelJson(Error("Email not found")))
@@ -120,12 +121,12 @@ object Users extends Controller with APIJsonFormats {
 
   def loginByEmail(email: String, loginPasswordHash: String): Future[Result] = User.findByEmail(email).map {
     users => users match {
-      case User(Some(`email`), Some(passwordHash), id, _, _,_, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+      case User(Some(`email`), Some(passwordHash), id, _, _,_, _, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
         val token = Token.newTokenForUser(id)
         Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-      case User(Some(`email`), None, _, _, Some(_), Some(_), _) :: Nil =>
+      case User(Some(`email`), None, _, _, Some(_), Some(_), _, _) :: Nil =>
         Unauthorized(Error.toTopLevelJson(Error("User logged by facebook")))
-      case User(Some(`email`), _, _, _, _, _, _) :: Nil =>
+      case User(Some(`email`), _, _, _, _, _, _, _) :: Nil =>
         Unauthorized(Error.toTopLevelJson(Error("Incorrect password")))
       case _ =>
         NotFound(Error.toTopLevelJson(Error("No user account for this email")))
@@ -134,12 +135,12 @@ object Users extends Controller with APIJsonFormats {
 
   def loginByUsername(username: String, loginPasswordHash: String): Future[Result] = User.findByUsername(username).map {
     users => users match {
-      case User(_, Some(passwordHash), id, Some(`username`), _, _, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
+      case User(_, Some(passwordHash), id, Some(`username`), _, _, _, _) :: Nil if Hash.bcrypt_compare(loginPasswordHash,passwordHash) =>
         val token = Token.newTokenForUser(id)
         Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token) )))
-      case User(_, None, _, Some(`username`), Some(_), Some(_), _) :: Nil =>
+      case User(_, None, _, Some(`username`), Some(_), Some(_), _, _) :: Nil =>
         Unauthorized(Error.toTopLevelJson(Error("User registered by facebook")))
-      case User(_, _, _, Some(`username`), _, _, _) :: Nil =>
+      case User(_, _, _, Some(`username`), _, _, _, _) :: Nil =>
         Unauthorized(Error.toTopLevelJson(Error("Incorrect password")))
       case _ =>
         NotFound(Error.toTopLevelJson(Error("No user account for this username")))
@@ -168,7 +169,7 @@ object Users extends Controller with APIJsonFormats {
       facebookUserId =>
         User.findByFacebookUserId(facebookUserId).map {
           users => users match {
-            case User(_, _, id, _, _, Some(`facebookUserId`), _) :: Nil =>
+            case User(_, _, id, _, _, Some(`facebookUserId`), _, _) :: Nil =>
               val token = Token.newTokenForUser(id)
               Ok(Json.toJson(TopLevel(users = Some(users.head), tokens = Some(token))))
             case _ =>

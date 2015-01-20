@@ -5,8 +5,9 @@ import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 import utils.Hash
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.util.Date
 
-case class User(email: Option[String], passwordHash: Option[String], id: String, username: Option[String], facebookToken: Option[String], facebookUserId: Option[String], state: Option[String] = None)
+case class User(email: Option[String], passwordHash: Option[String], id: String, username: Option[String], facebookToken: Option[String], facebookUserId: Option[String], creationDate: Date, state: Option[String] = None)
 case class NewUser(email: Option[String], password: Option[String], username: Option[String], facebookToken: Option[String])
 case class LoginUser(email: Option[String], password: Option[String], username: Option[String], facebookToken: Option[String])
 
@@ -23,7 +24,8 @@ object User extends MongoModel("users") {
     BSONObjectID.generate.stringify,
     newUser.username,
     newUser.facebookToken,
-    facebookUserId)
+    facebookUserId,
+    new Date())
 
   def create(user: User) = collection.insert(user)
   def findById(id: String) = collection.find(Json.obj("_id" -> Json.obj("$oid" -> id))).cursor[User].collect[List]()
