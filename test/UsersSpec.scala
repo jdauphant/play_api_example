@@ -25,7 +25,7 @@ class UsersSpec extends Specification {
         Seq("users" ->
           JsObject(Seq(
             "email" -> JsString("johndoe@siz.io"),
-            "passwordHash" -> JsString("6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"),
+            "password" -> JsString("6b3a55e0261b0304143f805a24924d0c1c44524821305f31d9277843b8a10f4e"),
             "username" -> JsString("johndoe"))
           )
         )
