@@ -20,3 +20,5 @@ libraryDependencies ++= Seq(
   "io.spray"          %% "spray-client"         % "1.3.2",
   "io.spray"          %% "spray-json"           % "1.3.1"
 )
+
+scalacOptions ++= Seq("-unchecked", "-deprecation","-feature")

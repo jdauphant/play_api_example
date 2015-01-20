@@ -6,7 +6,6 @@ import play.api.Play.current
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import reactivemongo.bson.BSONObjectID
 
 trait APIJsonFormats extends CommonJsonFormats {
   implicit def traversableWrites[A: Writes] = new Writes[Traversable[A]] {
