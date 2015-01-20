@@ -15,16 +15,17 @@ class ApplicationSpec extends Specification {
 
   "Application" should {
 
-    "send 404 on a bad request" in new WithApplication{
-      route(FakeRequest(GET, "/bad")) must beNone
+    "no route for bad api URL" in new WithApplication{
+      val badRequest = route(FakeRequest(GET, "/bad"))
+      badRequest must beNone
     }
 
     "render the index page" in new WithApplication{
       val home = route(FakeRequest(GET, "/")).get
 
       status(home) must equalTo(OK)
-      contentType(home) must beSome.which(_ == "application/vnd.api+json")
-      contentAsString(home) must contain ("""links""")
+      contentType(home) must beSome.which(_ == "application/json")
+      contentAsString(home) must contain("""links""")
     }
   }
 }
