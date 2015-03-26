@@ -21,3 +21,4 @@ Example of API with play framework 2.3 that use mongodb
 ## Run in a docker in vagrant
     vagrant up
     open http://localhost:9000
+(optionnal for auto reload) ```vagrant rsync-auto``` or ```vagrant gatling-rsync-auto```
